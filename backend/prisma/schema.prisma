@@ -14,4 +14,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Pokemon {
+  id                    Int   @id
+  name                  String
+  pokedexDescription    String?
+  spriteUrl             String?
+  artworkUrl            String?
+  types                 String[]
+  generation            Int
+  evolutionLine         String[]
+}
 
