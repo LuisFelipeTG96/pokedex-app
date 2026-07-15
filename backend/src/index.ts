@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import helmet from "helmet";
+import router from "./routes/router";
 
 // Initialize dotenv to load environment variables from .env file
 dotenv.config();
@@ -16,6 +17,14 @@ app.use(morgan("dev"));
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+// Use the router for handling routes
+app.use("/api", router);
+
+// Handle 404 errors for undefined routes
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ error: "Route not found" });
+});
 
 // Define a simple route
 app.get("/", (req: Request, res: Response) => {
