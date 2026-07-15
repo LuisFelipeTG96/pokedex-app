@@ -1,6 +1,4 @@
-// src\index.ts
-
-import express from "express";
+import express, { Application, Request, Response } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import helmet from "helmet";
@@ -8,7 +6,7 @@ import helmet from "helmet";
 // Initialize dotenv to load environment variables from .env file
 dotenv.config();
 
-const app = express();
+const app: Application = express();
 
 // Use Helmet for setting security-related HTTP headers
 app.use(helmet());
@@ -20,7 +18,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 // Define a simple route
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   res.send("Hello, TypeScript with Express!");
 });
 
