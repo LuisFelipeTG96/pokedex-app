@@ -19,7 +19,7 @@ model Pokemon {
   pokedexDescription    String?
   pokedexNumber         Int
   spriteUrl             String?
-  artworkUrl            String?
+  homeUrl               String?
   types                 String[]
   generation            Int
   evolutionLine         String[]
