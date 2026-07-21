@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { FlavorTextEntry, PokedexNumber, TypeInfo } from '../interfaces/pokemonInterfaces';
+import { createPokemon, getPokemonById } from '../models/pokemonModel';
 
 export async function fetchPokemonData(pokemonId: number) {
     try {
@@ -28,12 +30,12 @@ export async function transformPokemonData(pokemonId: number) {
 
         const transformedData = {
             id: pokemonData.id,
-            name: pokemonData.name,
-            pokedexDescription: speciesData.flavor_text_entries.find((entry: any) => entry.language.name === 'en')?.flavor_text || 'No description available.',
-            pokedexNumber: speciesData.pokedex_numbers.find((entry: any) => entry.pokedex.name === 'national')?.entry_number || pokemonData.id,
+            name: pokemonData.name.charAt(0).toUpperCase() + pokemonData.name.slice(1),
+            pokedexDescription: (speciesData.flavor_text_entries.find((entry: FlavorTextEntry) => entry.language.name === 'en')?.flavor_text || 'No description available.').replace(/[\n\r\f]/g, ' ').replace(/\s+/g, ' ').trim(),
+            pokedexNumber: speciesData.pokedex_numbers.find((entry: PokedexNumber) => entry.pokedex.name === 'national')?.entry_number || pokemonData.id,
             spriteUrl: pokemonData.sprites.front_default,
             homeUrl: pokemonData.sprites.other.home.front_default,
-            types: pokemonData.types.map((typeInfo: any) => typeInfo.type.name),
+            types: pokemonData.types.map((typeInfo: TypeInfo) => typeInfo.type.name),
             generation: Number(speciesData.generation.url.split('/').filter(Boolean).pop()),
         }
         
@@ -43,4 +45,22 @@ export async function transformPokemonData(pokemonId: number) {
         console.error(`Error transforming data for Pokémon ID ${pokemonId}:`, error);
         throw error;
     }
+}
+
+export async function getOrFetchPokemonData(pokemonId: number) {
+
+    try {
+        const existingPokemon = await getPokemonById(pokemonId);
+        if (existingPokemon) {
+            return existingPokemon;
+        } else {
+            const transformedData = await transformPokemonData(pokemonId);
+            const newPokemon = await createPokemon(transformedData);
+            return newPokemon;
+        }
+    } catch (error) {
+        console.error(`Error getting or fetching data for Pokémon ID ${pokemonId}:`, error);
+        throw error;
+    }
+
 }
