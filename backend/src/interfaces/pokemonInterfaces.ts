@@ -17,3 +17,10 @@ export interface TypeInfo {
         name: string;
     };
 }
+
+export interface EvolutionNode {
+  species: {
+    name: string;
+  };
+  evolves_to: EvolutionNode[];
+}

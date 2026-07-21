@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FlavorTextEntry, PokedexNumber, TypeInfo } from '../interfaces/pokemonInterfaces';
+import { EvolutionNode, FlavorTextEntry, PokedexNumber, TypeInfo } from '../interfaces/pokemonInterfaces';
 import { createPokemon, getPokemonById } from '../models/pokemonModel';
 
 export async function fetchPokemonData(pokemonId: number) {
@@ -27,6 +27,9 @@ export async function transformPokemonData(pokemonId: number) {
     try{
         const pokemonData = await fetchPokemonData(pokemonId);
         const speciesData = await fetchPokemonSpeciesData(pokemonId);
+        const evolutionChainData = await fetchEvolutionChainData(speciesData.evolution_chain.url);
+        const completeEvolutionLine = flattenEvolutionChain(evolutionChainData.chain);
+        const evolutionLineAux = completeEvolutionLine.filter(name => name !== pokemonData.name.toLowerCase());
 
         const transformedData = {
             id: pokemonData.id,
@@ -37,6 +40,7 @@ export async function transformPokemonData(pokemonId: number) {
             homeUrl: pokemonData.sprites.other.home.front_default,
             types: pokemonData.types.map((typeInfo: TypeInfo) => typeInfo.type.name),
             generation: Number(speciesData.generation.url.split('/').filter(Boolean).pop()),
+            evolutionLine: evolutionLineAux.map(name => name.charAt(0).toUpperCase() + name.slice(1)),
         }
         
         return transformedData;
@@ -63,4 +67,24 @@ export async function getOrFetchPokemonData(pokemonId: number) {
         throw error;
     }
 
+}
+
+export async function fetchEvolutionChainData(evolutionChainUrl: string) {
+    try {
+        const response = await axios.get(evolutionChainUrl);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching evolution chain data from ${evolutionChainUrl}:`, error);
+        throw error;
+    }
+}
+
+export function flattenEvolutionChain(node: EvolutionNode): string[] {
+    const names: string[] = [node.species.name];
+
+    for (const child of node.evolves_to) {
+        names.push(...flattenEvolutionChain(child));
+    }
+
+    return names;
 }
