@@ -1,8 +1,12 @@
 import prisma from '../config/prisma';
 import { Prisma } from '@prisma/client';
 
-export async function getAllPokemon() {
+export async function getAllPokemon(filters?: { type?: string; generation?: number }) {
     return prisma.pokemon.findMany({
+        where: {
+            ...(filters?.type && { types: { has: filters.type } }),
+            ...(filters?.generation && { generation: filters.generation }),
+        },
         orderBy: {
             pokedexNumber: 'asc',
         },
