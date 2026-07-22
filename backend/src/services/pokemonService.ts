@@ -38,7 +38,7 @@ export async function transformPokemonData(pokemonId: number) {
             pokedexNumber: speciesData.pokedex_numbers.find((entry: PokedexNumber) => entry.pokedex.name === 'national')?.entry_number || pokemonData.id,
             spriteUrl: pokemonData.sprites.front_default,
             homeUrl: pokemonData.sprites.other.home.front_default,
-            types: pokemonData.types.map((typeInfo: TypeInfo) => typeInfo.type.name),
+            types: pokemonData.types.map((typeInfo: TypeInfo) => typeInfo.type.name.charAt(0).toUpperCase() + typeInfo.type.name.slice(1)),
             generation: Number(speciesData.generation.url.split('/').filter(Boolean).pop()),
             evolutionLine: evolutionLineAux.map(name => name.charAt(0).toUpperCase() + name.slice(1)),
         }
