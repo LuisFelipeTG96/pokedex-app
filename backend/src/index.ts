@@ -2,12 +2,15 @@ import express, { Application, Request, Response } from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import helmet from "helmet";
+import cors from "cors";
 import router from "./routes/router";
 
 // Initialize dotenv to load environment variables from .env file
 dotenv.config();
 
 const app: Application = express();
+
+app.use(cors()); // Enable CORS for all routes
 
 // Use Helmet for setting security-related HTTP headers
 app.use(helmet());
